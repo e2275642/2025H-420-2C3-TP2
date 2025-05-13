@@ -17,7 +17,6 @@ class Tournoi:
 
 def charger_joueurs(self,chemin_csv):
     import csv
-    import joueur
     joueurs = []
     with open("joueurs.csv", "r", encoding='utf-8') as f:
         lecteur = csv.reader(f)
@@ -30,13 +29,6 @@ def charger_joueurs(self,chemin_csv):
         pass
 
     def charger_matchs(self, chemin_csv):
-        """
-        Lire un fichier CSV contenant les matchs.
-        Chaque ligne contient deux pseudos de joueurs (joueur1, joueur2).
-        Trouver les objets Joueur correspondants dans la liste de joueurs.
-        Pour chaque ligne, créer un objet Match et l'ajouter à la liste des matchs.
-        Utiliser la fonction lire_csv() du fichier utils.py.
-        """
         import csv
         matchs = []
         with open("matchs.csv", newline='', encoding='utf-8') as f:
@@ -58,7 +50,14 @@ def charger_joueurs(self,chemin_csv):
                     else:
                         print("mauvais matchup")
         return matchs
-        pass
+    """
+        Lire un fichier CSV contenant les matchs.
+        Chaque ligne contient deux pseudos de joueurs (joueur1, joueur2).
+        Trouver les objets Joueur correspondants dans la liste de joueurs.
+        Pour chaque ligne, créer un objet Match et l'ajouter à la liste des matchs.
+        Utiliser la fonction lire_csv() du fichier utils.py.
+                """
+    pass
         
 
     def saisir_scores(self):
@@ -98,16 +97,7 @@ def charger_joueurs(self,chemin_csv):
         for joueur in self.joueurs:
             print(f"{joueur.pseudo} - Victoires : {joueur.victoires}")
 
-    def sauvegarder(self, chemin_json):
-        """
-        Sauvegarder le tournoi dans un fichier JSON.
-        Le fichier doit contenir :
-        - le nom du tournoi
-        - la liste des joueurs (convertis en dictionnaires à l'aide de la fonction to_dict déjà implémenté dans la classe Joueur)
-        Utiliser la fonction sauvegarder_json() du fichier utils.py.
-        """
-
-        def convertir_json(tournoi1, joueurs, matchs):
+    def convertir_json(tournoi1, joueurs, matchs):
             return {
                 "nom":tournoi1,
                 "joueurs":[j.to_dict() for j in joueurs],
@@ -127,14 +117,34 @@ def charger_joueurs(self,chemin_csv):
 
         import json
 
-        def save_tournoi_json(nom_fichier, nom_tournoi, joueurs, matchs):
-            data =convertir_json(nom_tournoi, joueurs, matchs)
-            with open(nom_fichier, 'w', encoding='utf-8') as f:
-                json.dump(data, f)
+    def save_tournoi_json(nom_fichier, nom_tournoi, joueurs, matchs):
+        data =convertir_json(nom_tournoi, joueurs, matchs)
+        with open(nom_fichier, 'w', encoding='utf-8') as f:
+            json.dump(data, f)
 
         pass
 
-    def generer_rapport(self, chemin_texte):
+    def generer_rapport(nom_tournoi,matchs,classement,chemin_texte):
+        from utils import ecrire_texte
+        lignes = []
+        lignes.append("final report : " + nom_tournoi)
+        lignes.append("")
+
+
+        lignes.append("games played :")
+        for m in matchs:
+            joueur1, joueur2, score1, score2 = m
+            lignes.append(f"- {joueur1} {score1} - {score2} {joueur2}")
+        lignes.append("")
+
+
+        lignes.append("bracket :")
+        for i, (joueur, points) in enumerate(classement, start=1):
+            lignes.append(f"{i}. {joueur} - {points} pts")
+
+            contenu = "\n".join(lignes)
+            ecrire_texte(contenu, chemin_texte)
+
         """
         Générer un rapport du tournoi sous forme de fichier texte.
         Le rapport doit contenir :
